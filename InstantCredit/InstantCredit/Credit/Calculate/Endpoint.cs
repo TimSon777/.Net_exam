@@ -8,13 +8,12 @@ namespace InstantCredit.Credit.Calculate;
 public class Endpoint : IEndpoint<IResult, Request>
 {
     private readonly IValidator<Request> _validator;
-    private readonly ICreditCalculationService _creditCalculationService;
+    private ICreditCalculationService _creditCalculationService;
     private readonly ICriminalChecker _criminalChecker;
     
-    public Endpoint(IValidator<Request> validator, ICreditCalculationService creditCalculationService, ICriminalChecker criminalChecker)
+    public Endpoint(IValidator<Request> validator, ICriminalChecker criminalChecker)
     {
         _validator = validator;
-        _creditCalculationService = creditCalculationService;
         _criminalChecker = criminalChecker;
     }
 
@@ -29,7 +28,7 @@ public class Endpoint : IEndpoint<IResult, Request>
         var criminalStatus = await _criminalChecker.CheckAsync(request.Passport!, request.CertificateOfNoCriminalRecord);
         if (!criminalStatus.Succeeded)
         {
-            return Results.Conflict(criminalStatus.Errors);
+            return Results.Conflict(criminalStatus.Error);
         }
 
         var response = _creditCalculationService
@@ -46,6 +45,10 @@ public class Endpoint : IEndpoint<IResult, Request>
 
     public void AddRoute(IEndpointRouteBuilder app)
     {
-        app.MapPost(RouteConstants.Credit.Calculate, HandleAsync);
+        app.MapPost(RouteConstants.Credit.Calculate, async (Request r, ICreditCalculationService creditCalculationService) =>
+        {
+            _creditCalculationService = creditCalculationService;
+            return await HandleAsync(r);
+        });
     }
 }

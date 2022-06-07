@@ -2,6 +2,6 @@
     series: string;
     number: string;
     issueDate: Date;
-    IssuedBy: string;
+    issuedBy: string;
     registration: string;
 }

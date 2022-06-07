@@ -6,28 +6,53 @@ namespace InstantCredit.Infrastructure.Services;
 
 public class CriminalChecker : ICriminalChecker
 {
+    private readonly Dictionary<Passport, bool> _certificates = new()
+    {
+        [new Passport
+        {
+            Number = "111111",
+            Series = "1111",
+            Registration = "aaaaa",
+            IssueDate = DateTime.Now,
+            IssuedBy = "aaaaa"
+        }] = true,
+        [new Passport
+        {
+            Number = "111111",
+            Series = "2222",
+            Registration = "aaaaa",
+            IssueDate = DateTime.Now,
+            IssuedBy = "aaaaa"
+        }] = false,
+    };
+
     public async Task<CriminalStatus> CheckAsync(Passport passport, bool certificateOfNoCriminalRecord)
     {
-        var number = Random.Shared.Next(10);
-        
-        var criminalStatus = new CriminalStatus
+        if (_certificates.All(x => x.Key != passport))
         {
-            Succeeded = true,
-            Errors = new List<string>()
-        };
-        
-        switch (number)
-        {
-            case 0:
-                criminalStatus.Succeeded = false;
-                criminalStatus.Errors.Add("Passport error: passport was not found");
-                break;
-            case 1 when certificateOfNoCriminalRecord:
-                criminalStatus.Succeeded = true;
-                criminalStatus.Errors.Add("Certificate error: certificate was not found");
-                break;
+            return new CriminalStatus
+            {
+                Succeeded = false,
+                Error = "Your passport was n't found"
+            };
         }
 
-        return await Task.FromResult(criminalStatus);
+        var certificate = _certificates.First(x => x.Key != passport);
+        if (certificateOfNoCriminalRecord != certificate.Value)
+        {
+            return new CriminalStatus
+            {
+                Succeeded = false,
+                Error = certificateOfNoCriminalRecord
+                    ? "You don't have certificate"
+                    : "You have certificate"
+            };
+        }
+
+        return await Task.FromResult(
+            new CriminalStatus
+            {
+                Succeeded = true
+            });
     }
 }

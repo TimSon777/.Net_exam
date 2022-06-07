@@ -113,6 +113,30 @@ public class CreditCalculationService : ICreditCalculationService
 
     public CreditResult Build()
     {
-        throw new NotImplementedException();
+        var result = new CreditResult
+        {
+            Percent = 0,
+            CreditIssued = SumPoints >= 80
+        };
+        
+        if (SumPoints < 80)
+        {
+            return result;
+        }
+
+        result.Percent = SumPoints switch
+        {
+            < 84 => 30,
+            < 88 => 26,
+            < 92 => 22,
+            < 96 => 19,
+            < 100 => 15,
+            100 => 12.5,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        result.CreditIssued = true;
+        SumPoints = 0;
+        return result;
     }
 }

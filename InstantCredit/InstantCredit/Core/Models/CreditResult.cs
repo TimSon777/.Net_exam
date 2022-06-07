@@ -3,5 +3,5 @@
 public class CreditResult
 {
     public bool CreditIssued { get; set; }
-    public decimal Percent { get; set; }
+    public double Percent { get; set; }
 }

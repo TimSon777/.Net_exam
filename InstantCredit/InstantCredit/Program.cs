@@ -20,7 +20,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(
         .Converters
         .Add(new JsonStringEnumConverter()));
 
-builder.Services.AddTransient<ICreditCalculationService, CreditCalculationService>();
+builder.Services.AddScoped<ICreditCalculationService, CreditCalculationService>();
 builder.Services.AddTransient<ICriminalChecker, CriminalChecker>();
 
 var app = builder.Build();

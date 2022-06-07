@@ -2,7 +2,7 @@
 
 namespace InstantCredit.Shared.Models;
 
-public class PersonalityModel
+public class Personality
 {
     public string FirstName { get; set; }
     public string SecondName { get; set; }
